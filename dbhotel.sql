@@ -29,7 +29,7 @@ CREATE DATABASE IF NOT EXISTS dbhotel;
 --
 -- Selecionando o banco de dados `dbhotel`
 --
-USE dbhotel
+USE dbhotel;
 
 -- --------------------------------------------------------
 

@@ -1,4 +1,6 @@
-# Grande Hotel Senac – Sistema de Reservas
+# Grande Hotel Senac2 – Sistema de Reservas
+
+> Este repositório é uma continuação de [Projeto_Integrador-Senac (repositório)](https://github.com/joaovitordias13/Projeto_Integrador-Senac)
 
 Aplicação web full stack para gerenciamento de reservas do **Grande Hotel Senac**, composta por:
 
