@@ -4,7 +4,7 @@ global $conn;
 
 $user_id = 1;
 
-$sql = "SELECT * FROM reservations WHERE user_id = ? ORDER BY created_at DESC";
+$sql = "SELECT * FROM reservations WHERE user_id = ? ORDER BY create_at DESC";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
