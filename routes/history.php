@@ -14,7 +14,7 @@ $result = $stmt->get_result();
 
 $reservations = [];
 
-while ($row = result_fetch_assoc()) {
+while ($row = $result->fetch_assoc()) {
     $reservations[] = $row;
 }
 
