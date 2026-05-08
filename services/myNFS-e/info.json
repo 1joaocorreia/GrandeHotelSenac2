@@ -1,0 +1,35 @@
+{
+  "header": {
+    "numero_da_nota": "0000000000000000000000000",
+    "data_e_hora_da_emissao": "xxxxxxxxxxxx xxxxxxxxxx",
+    "codigo_de_verificacao": "xxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxx"
+  },
+  "body": {
+    "prestador_de_servicos": {
+      "nome_razao_social": "GRANDE HOTEL SENAC HOTELARIA & SERVIÇOS",
+      "cpf_cpnj": "000.000.000.00/0000",
+      "endereco": "xxx xxxxxxxxxx xxxxxxxxxx xxxxxx xx",
+      "municipio": "xxxxxxx",
+      "inscricao_municipal": "xxxxxxxxxxxxxxxxxxxxx"
+    },
+    "tomador_de_servicos": {
+      "nome_razao_social": "UNDEFINED",
+      "cpf_cnpj": "000.000.000.00",
+      "endereco": "xxx xxxxxxxxxx xxxxxxxxxx xxxxxx xx",
+      "municipio": "xxxxxxx",
+      "inscricao_municipal": "-------------------------"
+    },
+    "discriminacao_servicos": [
+      ""
+    ],
+    "servicos": [
+      {
+        "codigo": "",
+        "valor_total_das_reducoes": 0,
+        "base_de_calculo": 0,
+        "aliquota": 0,
+        "credito_abatimento_iptu": 0
+      }
+    ]
+  }
+}
