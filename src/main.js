@@ -23,6 +23,19 @@ function renderRoutes() {
     const url = getPath();
     const render = routes[url] || routes["/home"];
     render();
-}
+} 
 
 document.addEventListener('DOMContentLoaded', renderRoutes);
+
+function preencherReserva(reservation) {
+    const inputs = document.querySelectorAll('input[type="date"]');
+
+    if (inputs.length >= 2) {
+        inputs[0].value = reservation.checkin;
+        inputs[1].value = reservation.checkout;
+    }
+
+    console.log("Dados aplicados na tela");
+
+    localStorage.removeItem("repeatReservation");
+}
