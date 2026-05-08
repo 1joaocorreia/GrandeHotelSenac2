@@ -6,6 +6,8 @@ import CardLounge from "../components/CardLounge.js";
 import dateSelector from "../components/DateSelector.js";
 import { listAllRoomRequest } from "../api/roomsAPI.js";
 import { showModal } from "../components/Modal.js";
+import DateSelector from "../components/DateSelector.js";
+import { loadHistory } from "../components/History.js";
 
 export default function renderHomePage() {
     const nav = document.getElementById('navbar');
@@ -32,6 +34,24 @@ export default function renderHomePage() {
         errorCheckOut,
         errorGuests
     } = datesSelector.elements;
+
+    setTimeout(() => {
+        const repeatData = localStorage.getItem("repeatReservation");
+
+        if (repeatData) {
+            const reservation = JSON.parse(repeatData);
+
+            dateSelectorIn.value = reservation.checkin;
+            dateSelectorOut.value = reservation.checkout;
+
+            console.log("Reserva replicada:", reservation);
+
+            localStorage.removeItem("repeatReservation");
+
+            btnPesquisar.click();
+        }
+
+    }, 200);
 
     const cardDiv = document.createElement('div');
     cardDiv.className = 'cards';
@@ -170,4 +190,6 @@ export default function renderHomePage() {
 
     const footers = Footer();
     footer.appendChild(footers);
+
+    loadHistory();
 }
