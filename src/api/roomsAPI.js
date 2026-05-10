@@ -31,6 +31,18 @@ export async function listAllRoomRequest({ inicio, fim, capacidadeTotal }) {
     return quartos;
 }
 
+export async function getRoomById(id) {
+    const url = `/api/rooms/${id}`;
+    const response = await fetch(url);
+
+    let data = response.json() || null;
+    if (data == null || data == '') {
+        throw new Error(`No room found with id < ${id} >`);
+    }
+
+    return data;
+}
+
 export async function createRoomRequest(formData) {
     const token = getToken();
     if (!token) {

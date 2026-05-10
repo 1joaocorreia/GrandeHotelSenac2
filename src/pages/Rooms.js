@@ -1,9 +1,11 @@
 import Form from "../components/Form.js";
 import Navbar from "../components/Navbar.js";
 import Footer from "../components/Footer.js";
-import { createRoomRequest } from "../api/roomsAPI.js";
+import { createRoomRequest, getRoomById } from "../api/roomsAPI.js";
+import { getReviewByID } from "../api/reviewsAPI.js";
 import { isFuncionario } from "../api/authAPI.js";
 import { showModal } from "../components/Modal.js";
+import { RoomPage } from "../components/RoomPage.js";
 
 function toggleErrorState(errorElement, inputElement, message = null) {
     if (message) {
@@ -25,7 +27,8 @@ async function createRoomFormData(formData) {
     return result;
 }
 
-export default function renderRoomPage() {
+
+function renderRoomCreation() {
     const nav = document.getElementById('navbar');
     nav.innerHTML = '';
 
@@ -260,4 +263,51 @@ export default function renderRoomPage() {
     
     const footers = Footer();
     footer.appendChild(footers);
+}
+
+function renderRoomInfo(id) {
+
+    const nav = document.getElementById('navbar');
+    nav.innerHTML = '';
+
+    const navbar = Navbar();
+    nav.appendChild(navbar);
+
+    const root = document.getElementById('root');
+    root.innerHTML = '';
+
+    const footer = document.getElementById('footer');
+    footer.innerHTML = '';
+    
+    const footers = Footer();
+    footer.appendChild(footers);
+
+    if (! id || id == null) {
+        showModal("ID para o quarto faltando!");
+        return;
+    }
+
+    const roomData = getRoomById(id);
+    if (! roomData || roomData == null) {
+        showModal("Nenhuma informação encontrada para o quarto com id: " + id);
+        return;
+    } else {
+        const reviewsData = getReviewByID(id);
+        const roomPage = RoomPage(roomData, reviewsData);
+    }
+}
+
+export default function renderRoomPage() {
+
+    const pathParts = location.pathname.split('/');
+    pathParts.shift();
+
+    if (pathParts[1] === 'create') {
+        renderRoomCreation();
+    }
+    else if (pathParts[1] == 'info') {
+        renderRoomInfo(pathParts[2] || null);
+    } else {
+        window.location.href = "/home";
+    }
 }

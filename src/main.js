@@ -12,20 +12,17 @@ const routes = {
     "/room": renderRoomPage
 };
 
-function getPath() {
-    const pathParts = location.pathname.split('/').filter(Boolean);
+function getRoute() {
+    const pathParts = location.pathname.split('/');
     pathParts.shift();
-    const path = '/' + pathParts.join('/');
-    return path;
+    return `/${pathParts[0]}`;
 }
 
 function renderRoutes() {
-    const url = getPath();
+    const url = getRoute();
     const render = routes[url] || routes["/home"];
     render();
-} 
-
-document.addEventListener('DOMContentLoaded', renderRoutes);
+}
 
 function preencherReserva(reservation) {
     const inputs = document.querySelectorAll('input[type="date"]');
@@ -39,3 +36,5 @@ function preencherReserva(reservation) {
 
     localStorage.removeItem("repeatReservation");
 }
+
+document.addEventListener('DOMContentLoaded', renderRoutes);

@@ -104,6 +104,7 @@ export default function Card(quarto, index) {
                     <strong>Preço:</strong> R$ ${preco}
                 </p>
                 <a href="#" class="btn btn-primary btn-reservar">Reservar</a>
+                <a href="/room/info/${id}" class="btn btn-primary" style="margin-top: 10px;">Mais informações</a>
             </div>
         </div>
     `;
