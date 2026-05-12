@@ -35,7 +35,12 @@ export async function getRoomById(id) {
     const url = `/api/rooms/${id}`;
     const response = await fetch(url);
 
-    let data = response.json() || null;
+    let data = null;
+    try {
+        data = await response.json();
+    } catch (ex) {
+        throw new Error(`Failure parsing json from API response.`);
+    }
     if (data == null || data == '') {
         throw new Error(`No room found with id < ${id} >`);
     }

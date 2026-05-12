@@ -42,3 +42,21 @@ export async function createClient(nome, cpf, telefone, email, senha) {
         };
     }
 }
+
+export async function getClientById(id) {
+    const url = `/api/client/${id}`;
+    const response = await fetch(url);
+    
+    let data = null;
+    try {
+        data = await response.json();
+    } catch (ex) {
+        throw new Error(`Not possible to retrive information from client with id < ${id} >`);
+    }
+
+    if (data == null) {
+        return null;
+    }
+
+    return data;
+}

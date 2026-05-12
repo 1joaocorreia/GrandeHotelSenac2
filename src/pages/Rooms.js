@@ -2,7 +2,7 @@ import Form from "../components/Form.js";
 import Navbar from "../components/Navbar.js";
 import Footer from "../components/Footer.js";
 import { createRoomRequest, getRoomById } from "../api/roomsAPI.js";
-import { getReviewByID } from "../api/reviewsAPI.js";
+import { getReviewsByRoomId } from "../api/reviewsAPI.js";
 import { isFuncionario } from "../api/authAPI.js";
 import { showModal } from "../components/Modal.js";
 import { RoomPage } from "../components/RoomPage.js";
@@ -265,7 +265,7 @@ function renderRoomCreation() {
     footer.appendChild(footers);
 }
 
-function renderRoomInfo(id) {
+async function renderRoomInfo(id) {
 
     const nav = document.getElementById('navbar');
     nav.innerHTML = '';
@@ -276,6 +276,14 @@ function renderRoomInfo(id) {
     const root = document.getElementById('root');
     root.innerHTML = '';
 
+    
+    // Adding own style
+    const pageRoomStyle = document.createElement('link');
+    pageRoomStyle.rel = "stylesheet";
+    pageRoomStyle.href = "/src/css/roomPage.css";
+    document.head.appendChild(pageRoomStyle);
+
+
     const footer = document.getElementById('footer');
     footer.innerHTML = '';
     
@@ -283,30 +291,32 @@ function renderRoomInfo(id) {
     footer.appendChild(footers);
 
     if (! id || id == null) {
-        showModal("ID para o quarto faltando!");
+        window.location.href = "/home";
         return;
     }
 
-    const roomData = getRoomById(id);
+    const roomData = await getRoomById(id);
     if (! roomData || roomData == null) {
         showModal("Nenhuma informação encontrada para o quarto com id: " + id);
         return;
     } else {
-        const reviewsData = getReviewByID(id);
-        const roomPage = RoomPage(roomData, reviewsData);
+        const reviewsData = await getReviewsByRoomId(id);
+        const roomPage = await RoomPage(roomData, reviewsData);
+        root.innerHTML = roomPage;
+        return;
     }
 }
 
-export default function renderRoomPage() {
+export default async function renderRoomPage() {
 
     const pathParts = location.pathname.split('/');
     pathParts.shift();
 
     if (pathParts[1] === 'create') {
-        renderRoomCreation();
+        await renderRoomCreation();
     }
     else if (pathParts[1] == 'info') {
-        renderRoomInfo(pathParts[2] || null);
+        await renderRoomInfo(pathParts[2]);
     } else {
         window.location.href = "/home";
     }

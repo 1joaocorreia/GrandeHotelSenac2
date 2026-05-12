@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.main {
+    margin-top: 6rem;
+    border: 1px solid black;
+    border-radius: 8px;
+    max-width: 90%;
+    width: 90%;
+}
+
+.horizontal {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.field {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 1em;
+    margin-bottom: 2rem;
+    border: 1px solid #9da16e;
+}
+
+.buttons_field {
+    display: flex;
+    flex-flow: row nowrap;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.button {
+    background-color: #9da16e;
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+    border: 1px solid #2f2f2f;
+}
+
+p {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    text-align: justify;
+    font-style: italic;
+}
+
+.single_review {
+    display: flex;
+    flex-flow: column nowrap;
+    border: 1px dashed #2f2f2f;
+    padding: 15px;
+}
+
+.review_header {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+}
+
+.review_header_left {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 20px;
+}
