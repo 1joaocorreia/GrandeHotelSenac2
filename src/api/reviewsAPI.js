@@ -1,37 +1,64 @@
 export async function getReviewById(id) {
+	const ret = {
+		ok: false,
+		raw: null,
+		message: ""
+	};
+	
 	if (! id || id == null) {
-		throw new Error("Missing room ID");
+		ret["message"] = "An error ocurred. ID is missing.";
+		return ret;
 	}
 	
 	const url = `/api/reviews/${id}`;
 	const response = await fetch(url);
-
-	let data = null;
+	
 	try {
-		data = response.json();
+		ret.raw = await response.json();
 	} catch(ex) {
-		data = null;
-		throw new Error("Not possible to interpret the response from server.");
+		ret.raw = null;
+		ret.message = `An error ocurred. Tried: ${url}. Cause: < ${ex.cause} >. Message: ${ex.message}`;
+		return ret;
+	}
+	
+	if (! response.ok) {
+		ret.message = `An error ocurred. Tried ${url}. Code: ${response.status}. Message: ${ret.raw.message}`;
+		return ret;
 	}
 
-	return data;
+	ret.ok = true;
+	ret.message = "No errors.";
+	return ret;
 }
 
 export async function getReviewsByRoomId(id) {
+	const ret = {
+		ok: false,
+		raw: null,
+		message: ""	
+	};
+
 	if (! id || id == null) {
-		throw new Error("Missing room ID");
+		ret.message = "An error ocurred. ID is missing";
+		return ret;
 	}
 
 	const url = `/api/reviews/room/${id}`;
 	const response = await fetch(url);
 
-	let data = null;
 	try {
-		data = response.json();
+		ret.raw = await response.json();
 	} catch (ex) {
-		data = null;
-		throw new Error("Not possible to interpret the response from server.");
+		ret.message = `An error ocurred. Tried: ${url}. Cause: < ${ex.cause} >. Message: ${ex.message}`;
+		return ret;
 	}
 
-	return data;
+	if (! response.ok) {
+		ret.message = `An error ocurred. Tried: ${url}. Code: ${response.status}. Message: ${ret.raw.message}`;
+		return ret;
+	}
+	
+	ret.ok = true;
+	ret.message = "No errors.";
+	return ret;
 }

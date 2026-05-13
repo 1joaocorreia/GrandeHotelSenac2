@@ -19,7 +19,7 @@ $token = str_replace('Bearer ', '', $headers['Authorization']);
 $decoded = validateToken($token);
 
 if(!$decoded) {
-    return jsonRsponse(['error' => 'Token inválido'], 401);
+    return jsonResponse(['error' => 'Token inválido'], 401);
 }
 
 $user_id = $decoded['id'];

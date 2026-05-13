@@ -13,9 +13,9 @@ export default function Footer() {
         <p class="footer-contact mb-1">Campos do Jordão · SP · Brasil</p>
         <p class="footer-contact mb-2">Tel.: (12) 4000-2025 · reservas@grandehotelsenac.com.br</p>
         <div class="d-inline-flex gap-3">
-          <a href="#"><img class="footer-link" src="public/assets/images/instagram.svg"></a>
-          <a href="#"><img class="footer-link" src="public/assets/images/facebook.svg"></a>
-          <a href="#"><img class="footer-link" src="public/assets/images/youtube.svg"></a>
+          <a href="#"><img class="footer-link" src="/public/assets/images/instagram.svg"></a>
+          <a href="#"><img class="footer-link" src="/public/assets/images/facebook.svg"></a>
+          <a href="#"><img class="footer-link" src="/public/assets/images/youtube.svg"></a>
         </div>
       </div>
     </div>

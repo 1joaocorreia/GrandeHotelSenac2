@@ -44,19 +44,29 @@ export async function createClient(nome, cpf, telefone, email, senha) {
 }
 
 export async function getClientById(id) {
+	const ret = {
+		ok: false,
+		raw: null,
+		message: ""
+	};
+	
     const url = `/api/client/${id}`;
     const response = await fetch(url);
     
-    let data = null;
     try {
-        data = await response.json();
+        ret.raw = await response.json();
     } catch (ex) {
-        throw new Error(`Not possible to retrive information from client with id < ${id} >`);
+    	ret.raw = null;
+        ret.message = `An error ocurred. Tried: ${url}. Cause: < ${ex.cause} >. Message: ${ex.message}`
+        return ret;
     }
 
-    if (data == null) {
-        return null;
+    if (! response.ok) {
+    	ret.message = `An error ocurred. Tried: ${url}. Code: ${response.status}. Server message: ${ret.raw.message}`;
+    	return ret;
     }
 
-    return data;
+	ret.ok = true;
+	ret.message = "No errors.";
+    return ret;
 }

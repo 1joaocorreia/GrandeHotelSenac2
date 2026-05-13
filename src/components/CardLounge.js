@@ -8,7 +8,7 @@ export default function CardLounge(cardLoungeItem, index) {
     <div class="card card-lounge" style="animation-delay: ${delay}ms">
         <div class="card-lounge-image-wrapper">
             <img 
-                src="public/assets/images/${path}" 
+                src="/public/assets/images/${path}" 
                 class="card-img-top card-lounge-img" 
                 alt="${title || ""}"
             >

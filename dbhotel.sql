@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2deb1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Tempo de geração: 24/11/2025 às 18:38
--- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.0.30
+-- Host: localhost:3306
+-- Generation Time: May 12, 2026 at 08:53 PM
+-- Server version: 11.8.1-MariaDB-4
+-- PHP Version: 8.4.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,23 +18,17 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Banco de dados: `dbhotel`
+-- Database: `dbhotel`
 --
 
---
--- Criação do banco de dados `dbhotel`
---
 CREATE DATABASE IF NOT EXISTS dbhotel;
 
---
--- Selecionando o banco de dados `dbhotel`
---
 USE dbhotel;
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `adicionais`
+-- Table structure for table `adicionais`
 --
 
 CREATE TABLE `adicionais` (
@@ -46,7 +40,23 @@ CREATE TABLE `adicionais` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `cargos`
+-- Table structure for table `avaliacoes`
+--
+
+CREATE TABLE `avaliacoes` (
+  `id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL,
+  `client_author` int(11) DEFAULT NULL,
+  `user_author` int(11) DEFAULT NULL,
+  `conteudo` text NOT NULL,
+  `data` datetime NOT NULL DEFAULT current_timestamp(),
+  `stars` int(5) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cargos`
 --
 
 CREATE TABLE `cargos` (
@@ -55,18 +65,17 @@ CREATE TABLE `cargos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Despejando dados para a tabela `cargos`
+-- Dumping data for table `cargos`
 --
 
 INSERT INTO `cargos` (`id`, `nome`) VALUES
-(1, 'admin'),
 (2, 'func'),
 (3, 'cliente');
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `clientes`
+-- Table structure for table `clientes`
 --
 
 CREATE TABLE `clientes` (
@@ -79,10 +88,11 @@ CREATE TABLE `clientes` (
   `cargo_id` int(11) NOT NULL DEFAULT 3
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `imagens`
+-- Table structure for table `imagens`
 --
 
 CREATE TABLE `imagens` (
@@ -93,7 +103,7 @@ CREATE TABLE `imagens` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `imagens_quartos`
+-- Table structure for table `imagens_quartos`
 --
 
 CREATE TABLE `imagens_quartos` (
@@ -104,7 +114,22 @@ CREATE TABLE `imagens_quartos` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `pedidos`
+-- Table structure for table `notas_fiscais`
+--
+
+CREATE TABLE `notas_fiscais` (
+  `numero_nota` int(20) UNSIGNED ZEROFILL NOT NULL,
+  `data_e_hora` datetime NOT NULL DEFAULT current_timestamp(),
+  `codigo_verificacao` uuid NOT NULL DEFAULT uuid(),
+  `tomador_servico` int(11) NOT NULL,
+  `servico_consumido` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pedidos`
 --
 
 CREATE TABLE `pedidos` (
@@ -115,10 +140,11 @@ CREATE TABLE `pedidos` (
   `data` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `quartos`
+-- Table structure for table `quartos`
 --
 
 CREATE TABLE `quartos` (
@@ -131,10 +157,11 @@ CREATE TABLE `quartos` (
   `disponivel` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `reservas`
+-- Table structure for table `reservas`
 --
 
 CREATE TABLE `reservas` (
@@ -149,7 +176,7 @@ CREATE TABLE `reservas` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `usuarios`
+-- Table structure for table `usuarios`
 --
 
 CREATE TABLE `usuarios` (
@@ -160,33 +187,32 @@ CREATE TABLE `usuarios` (
   `cargo_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Despejando dados para a tabela `usuarios`
---
-
-INSERT INTO `usuarios` (`nome`, `email`, `senha`, `cargo_id`) VALUES
-('Funcionário', 'funcionario@hotelsenac.com', '$2y$10$VTIFACmi4W38zaaQ5rn8EuxB6tGgO.9dWjLFJA7GyYV/kpENIXOJe', 2);
 
 --
--- Índices para tabelas despejadas
---
-
---
--- Índices de tabela `adicionais`
+-- Indexes for table `adicionais`
 --
 ALTER TABLE `adicionais`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `id` (`id`);
 
 --
--- Índices de tabela `cargos`
+-- Indexes for table `avaliacoes`
+--
+ALTER TABLE `avaliacoes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `client_author` (`client_author`),
+  ADD KEY `user_author` (`user_author`),
+  ADD KEY `room_id` (`room_id`);
+
+--
+-- Indexes for table `cargos`
 --
 ALTER TABLE `cargos`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `id` (`id`);
 
 --
--- Índices de tabela `clientes`
+-- Indexes for table `clientes`
 --
 ALTER TABLE `clientes`
   ADD PRIMARY KEY (`id`),
@@ -194,21 +220,29 @@ ALTER TABLE `clientes`
   ADD KEY `cargo_id` (`cargo_id`);
 
 --
--- Índices de tabela `imagens`
+-- Indexes for table `imagens`
 --
 ALTER TABLE `imagens`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `id` (`id`);
 
 --
--- Índices de tabela `imagens_quartos`
+-- Indexes for table `imagens_quartos`
 --
 ALTER TABLE `imagens_quartos`
   ADD UNIQUE KEY `imagem_id` (`imagem_id`) USING BTREE,
   ADD KEY `quarto_id` (`quarto_id`);
 
 --
--- Índices de tabela `pedidos`
+-- Indexes for table `notas_fiscais`
+--
+ALTER TABLE `notas_fiscais`
+  ADD PRIMARY KEY (`numero_nota`),
+  ADD KEY `tomador_servico` (`tomador_servico`),
+  ADD KEY `servico_consumido` (`servico_consumido`);
+
+--
+-- Indexes for table `pedidos`
 --
 ALTER TABLE `pedidos`
   ADD PRIMARY KEY (`id`),
@@ -217,14 +251,14 @@ ALTER TABLE `pedidos`
   ADD KEY `usuario_id` (`usuario_id`);
 
 --
--- Índices de tabela `quartos`
+-- Indexes for table `quartos`
 --
 ALTER TABLE `quartos`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `id` (`id`);
 
 --
--- Índices de tabela `reservas`
+-- Indexes for table `reservas`
 --
 ALTER TABLE `reservas`
   ADD PRIMARY KEY (`id`),
@@ -234,7 +268,7 @@ ALTER TABLE `reservas`
   ADD KEY `adicional_id` (`adicional_id`);
 
 --
--- Índices de tabela `usuarios`
+-- Indexes for table `usuarios`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id`),
@@ -242,83 +276,95 @@ ALTER TABLE `usuarios`
   ADD KEY `cargo_id` (`cargo_id`);
 
 --
--- AUTO_INCREMENT para tabelas despejadas
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT de tabela `adicionais`
+-- AUTO_INCREMENT for table `adicionais`
 --
 ALTER TABLE `adicionais`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de tabela `cargos`
+-- AUTO_INCREMENT for table `avaliacoes`
+--
+ALTER TABLE `avaliacoes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `cargos`
 --
 ALTER TABLE `cargos`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT de tabela `clientes`
+-- AUTO_INCREMENT for table `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT de tabela `imagens`
+-- AUTO_INCREMENT for table `imagens`
 --
 ALTER TABLE `imagens`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de tabela `pedidos`
+-- AUTO_INCREMENT for table `notas_fiscais`
+--
+ALTER TABLE `notas_fiscais`
+  MODIFY `numero_nota` int(20) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `pedidos`
 --
 ALTER TABLE `pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT de tabela `quartos`
+-- AUTO_INCREMENT for table `quartos`
 --
 ALTER TABLE `quartos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT de tabela `reservas`
+-- AUTO_INCREMENT for table `reservas`
 --
 ALTER TABLE `reservas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT de tabela `usuarios`
+-- AUTO_INCREMENT for table `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- Restrições para tabelas despejadas
+-- Constraints for dumped tables
 --
 
 --
--- Restrições para tabelas `clientes`
+-- Constraints for table `clientes`
 --
 ALTER TABLE `clientes`
   ADD CONSTRAINT `clientes_ibfk_1` FOREIGN KEY (`cargo_id`) REFERENCES `cargos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Restrições para tabelas `imagens_quartos`
+-- Constraints for table `imagens_quartos`
 --
 ALTER TABLE `imagens_quartos`
   ADD CONSTRAINT `imagens_quartos_ibfk_2` FOREIGN KEY (`imagem_id`) REFERENCES `imagens` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `imagens_quartos_ibfk_3` FOREIGN KEY (`quarto_id`) REFERENCES `quartos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Restrições para tabelas `pedidos`
+-- Constraints for table `pedidos`
 --
 ALTER TABLE `pedidos`
   ADD CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Restrições para tabelas `reservas`
+-- Constraints for table `reservas`
 --
 ALTER TABLE `reservas`
   ADD CONSTRAINT `reservas_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -326,7 +372,7 @@ ALTER TABLE `reservas`
   ADD CONSTRAINT `reservas_ibfk_3` FOREIGN KEY (`adicional_id`) REFERENCES `adicionais` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Restrições para tabelas `usuarios`
+-- Constraints for table `usuarios`
 --
 ALTER TABLE `usuarios`
   ADD CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`cargo_id`) REFERENCES `cargos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;

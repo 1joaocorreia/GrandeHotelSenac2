@@ -296,12 +296,11 @@ async function renderRoomInfo(id) {
     }
 
     const roomData = await getRoomById(id);
-    if (! roomData || roomData == null) {
-        showModal("Nenhuma informação encontrada para o quarto com id: " + id);
-        return;
+    if (! roomData.ok || roomData.raw == null) {
+        window.location.href = "/home";
     } else {
         const reviewsData = await getReviewsByRoomId(id);
-        const roomPage = await RoomPage(roomData, reviewsData);
+        const roomPage = await RoomPage(roomData.raw, (reviewsData.ok) ? reviewsData.raw : []);
         root.innerHTML = roomPage;
         return;
     }

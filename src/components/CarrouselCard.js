@@ -7,7 +7,7 @@ export default function CarrouselCard(fotos = [], idSuffix = "") {
     if (!temFotos) {
         carrousel.innerHTML = `
             <div class="carousel-placeholder">
-                <img src="public/assets/images/icon.ico" class="d-block w-100" alt="Imagem do quarto">
+                <img src="/public/assets/images/icon.ico" class="d-block w-100" alt="Imagem do quarto">
             </div>
         `;
         return carrousel;
@@ -26,7 +26,7 @@ export default function CarrouselCard(fotos = [], idSuffix = "") {
 
     const items = fotos.map((foto, index) => `
         <div class="carousel-item ${index === 0 ? 'active' : ''}">
-            <img src="uploads/${foto}" class="d-block w-100" alt="Foto do quarto">
+            <img src="/uploads/${foto}" class="d-block w-100" alt="Foto do quarto">
         </div>
     `).join("");
 

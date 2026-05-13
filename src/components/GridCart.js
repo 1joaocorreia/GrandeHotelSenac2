@@ -354,7 +354,7 @@ export default function Grid(cartItems = [], onUpdateCart) {
                         data-item-index="${index}"
                         title="Remover item"
                     >
-                        <img src="public/assets/images/trash.svg" alt="Remover" width="20" height="20">    
+                        <img src="/public/assets/images/trash.svg" alt="Remover" width="20" height="20">    
                     </button>
                 </div>
             </td>

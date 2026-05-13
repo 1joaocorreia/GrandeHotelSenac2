@@ -3,13 +3,15 @@ import renderRegisterPage from "./pages/Register.js";
 import renderHomePage from "./pages/Home.js";
 import renderCartPage from "./pages/Cart.js";
 import renderRoomPage from "./pages/Rooms.js";
+import renderProfilePage from "./pages/Profile.js";
 
 const routes = {
     "/login": renderLoginPage,
     "/register": renderRegisterPage,
     "/home": renderHomePage,
     "/cart": renderCartPage,
-    "/room": renderRoomPage
+    "/room": renderRoomPage,
+    "/profile": renderProfilePage
 };
 
 function getRoute() {

@@ -32,20 +32,30 @@ export async function listAllRoomRequest({ inicio, fim, capacidadeTotal }) {
 }
 
 export async function getRoomById(id) {
+	const ret = {
+		ok: false,
+		raw: null,
+		message: ""
+	};
+
+	if (! id || id == null) {
+		ret.message = "An error ocurred. ID is missing";
+		return ret;
+	}
+	
     const url = `/api/rooms/${id}`;
     const response = await fetch(url);
 
-    let data = null;
     try {
-        data = await response.json();
+        ret.raw = await response.json();
     } catch (ex) {
-        throw new Error(`Failure parsing json from API response.`);
-    }
-    if (data == null || data == '') {
-        throw new Error(`No room found with id < ${id} >`);
+    	ret.message = `An error ocurred. Tried: ${url}. Cause: < ${ex.cause} >. Message: ${ex.message}`;
+    	return ret;
     }
 
-    return data;
+	ret.ok = true;
+	ret.message = "No errors.";
+    return ret;
 }
 
 export async function createRoomRequest(formData) {
@@ -59,7 +69,7 @@ export async function createRoomRequest(formData) {
     }
 
     try {
-        const response = await fetch("api/rooms", {
+        const response = await fetch("/api/rooms", {
             method: "POST",
             headers: {
                 "Authorization": "Bearer " + token

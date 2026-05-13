@@ -16,24 +16,24 @@ function generateStars(amount) {
 async function generateHtmlForReviews(reviewData) {
 	let html = "";
 	if (reviewData == null || reviewData.length == 0) {
-		return "";
+		return `<p style="color: darkred;">Nenhuma avaliação encontrada</p>`;
 	}
-
+	
 	for(let c = 0; c < reviewData.length; c++) {
 		const review = reviewData[c];
 		const client = await getClientById(review["client_author"]);
-		if (client != null) {
+		if (client.ok && client.raw != null) {
 			html += `
 				<div class="single_review">
 					<div class="review_header">
 						<div class="review_header_left">
-							<p class="review_p""><b>${client["nome"]}</b></p>
-							<p>${generateStars(review['stars'])}</p>
+							<p class="review_p""><b>${client.raw.nome}</b></p>
+							<p>${generateStars(review.stars)}</p>
 						</div>
-						<p class="review_p" style="text-align: right;">${review["data"]}</p>
+						<p class="review_p" style="text-align: right;">${review.data}</p>
 					</div>
 					<div class="review_body">
-						<p>${review['conteudo']}</p>
+						<p>${review.conteudo}</p>
 					</div>
 				</div>
 			`;
@@ -43,10 +43,9 @@ async function generateHtmlForReviews(reviewData) {
 }
 
 export async function RoomPage(roomData, reviewData) {
-	
 	const reviewsHtml = await generateHtmlForReviews(reviewData);
 
-	return `
+	const html = `
 		<div class="main">
 			<div class="horizontal" style="align-items: baseline; justify-content: space-between; padding: 1rem;">
 				<h1 class="title">${roomData['nome']}</h1>
@@ -64,10 +63,9 @@ export async function RoomPage(roomData, reviewData) {
 				${reviewsHtml}
 			</div>
 			<div class="horizontal buttons_field">
-				<a class="button" style="max-width: 50%; width: 50%; text-align: center;">RESERVAR</a>
-				<a class="button" style="max-width: 50%; width: 50%; text-align: center;">ADICIONAR AO CARRINHO</a>
-			</div>
+				<a class="button" style="max-width: 100%; width: 100%; text-align: center;" id="btn-reservar">RESERVAR</a>			</div>
 		</div>
 	`;
-
+		
+	return html;
 }
