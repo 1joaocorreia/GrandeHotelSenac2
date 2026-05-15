@@ -20,7 +20,7 @@ class ClientModel{
     }
 
     public static function getById($conn, $id) {
-        $sql = "SELECT id, nome, email, telefone, cpf, cargo_id FROM clientes WHERE id= ?";
+        $sql = "SELECT id, nome, email, telefone, endereco, cpf, cargo_id FROM clientes WHERE id= ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
