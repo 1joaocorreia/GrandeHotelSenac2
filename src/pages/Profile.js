@@ -1,18 +1,325 @@
-import { getCurrentUser } from "../api/authAPI.js";
+import { getCurrentUser, isCliente } from "../api/authAPI.js";
+import { getClientById } from "../api/clientAPI.js";
+import { getDadosFaturamentoByClientId } from "../api/faturamentoAPI.js";
+import { getEnderecoById } from "../api/enderecoAPI.js";
+import { LeftMenu, LeftMenuRow } from "../components/LeftMenu.js";
+import { ErrorMessage } from "../components/ErrorMessage.js";
 import Navbar from "../components/Navbar.js";
 import Footer from "../components/Footer.js";
-import LeftMenu from "../components/LeftMenu.js";
-import { LeftMenuRow } from "../components/LeftMenu.js";
 import Loading from "../components/Loading.js";
 import renderNotLoggedPage from "./NotLogged.js";
+import ChangeDialog from "../components/ChangeDialog.js";
+import { loadHistory } from "../components/History.js";
+
+
+const rowsID = ["row-preferences", "row-faturamento", "row-historico"];
+
+/*
+    Atribui a classe "unselected-row" para todos os rows do menu lateral esquerdo.
+    Atribui a classe "selected-row" apenas para o row com o id < rowId >
+*/
+function setActiveMenuRow(rowId) {
+    const rowElement = document.getElementById(rowId);
+    const allRows = document.getElementsByClassName("row-button");
+    
+    /* Desabilitando todos os rows */
+    for (let c = 0; c < allRows.length; c++) {
+        const currentRow = allRows[c];
+        currentRow.classList.replace("selected-row", "unselected-row");
+    }
+
+    // Habilitando somente o escolhido
+    rowElement.classList.replace("unselected-row", "selected-row");
+}
+
+function renderUnknownProblem() {
+    const renderZone = document.getElementById('render-zone');
+    if (! renderZone) { return; }
+
+    const errorMessage = ErrorMessage("Um erro inesperado ocorreu.", "Tente novamente mais tarde.");
+    renderZone.innerHTML = '';
+    renderZone.appendChild(errorMessage);
+}
+
+function renderLoading() {
+    const renderZone = document.getElementById('render-zone');
+    if (! renderZone) { return; }
+    renderZone.innerHTML = Loading("200px");
+}
+
+async function askUserFieldValue(label, oldValue) {
+return new Promise((resolve, reject) => {
+
+    const renderZone = document.getElementById('render-zone');
+	
+	if (! renderZone) { reject("Render Zone não encontrada"); }
+	
+	const removeDialog = () => {
+		renderZone.removeChild(document.getElementById('dialog-container'));
+    };
+
+	const cancelAction = () => {
+        removeDialog();
+        reject("Cancelado");
+    };
+
+    const confirmAction = () => {
+        const inputValue = document.getElementById('dialog-input').value;
+        removeDialog();
+        resolve(inputValue);
+    };
+	
+    renderZone.appendChild(ChangeDialog(label, oldValue));
+
+	document.getElementById('save-change').addEventListener('click', confirmAction);
+	document.getElementById('cancel-change').addEventListener('click', cancelAction);
+
+});
+}
 
 /* 
-    Essa função renderiza o conteúdo da página com base no row escolhido.
-    Ex: informações relacionadas à dados de faturamento caso o row escolhido seja o de faturamento.
+    Essa função é chamada quando o usuário clica no botão para modificar o valor de um campo.
+    Exemplo de campo: nome, email, email de faturamento, etc...
 */
-function reRender(event) {
-    console.log("reRender called by target: ");
-    console.log(event.target);
+async function changeField(event, fieldId) {
+
+    /* ID do campo x nome da coluna no banco de dados */
+    const idsAndColumns = {
+        "nome-field": "nome",
+        "email-field": "email",
+        "telefone-field": "telefone",
+        "endereco-field": "endereco",
+        "cpf-field": "cpf",
+        "billing-address-field": "endereco_faturamento",
+        "billing-email-field": "email_faturamento"
+    };
+
+    if(! idsAndColumns.hasOwnProperty(fieldId)) {
+        renderUnknownProblem();
+        return;
+    }
+
+    const element = document.getElementById(fieldId);
+    
+    if (! element) {
+        renderUnknownProblem();
+        return;
+    }
+    
+    const identifierElement = element.getElementsByClassName('value-identifier')[0];
+    const valueitselfElement = element.getElementsByClassName('value-itself')[0];
+
+    const label = identifierElement.textContent;
+    const oldValue = valueitselfElement.textContent;
+    let newValue = null;
+    
+    try {
+    	newValue = await askUserFieldValue(label, oldValue);
+    } catch (err) {
+        newValue = null;
+    }
+
+    console.log(`
+        Values for: < ${label} >
+        OLD: ${oldValue}
+        NEW: ${newValue ?? "undefined"}
+    `);
+
+}
+
+/* 
+    Essa função retorna um botão "Change" que, quando apertado, aciona o evento
+    changeField() para o campo com id < targetFieldId >
+ */
+const changeButton = (buttonLabel, targetFieldId) => {
+    const btn = document.createElement('button');
+    btn.innerText = buttonLabel;
+    btn.classList.add("btn-change-field");
+    btn.onclick = (event) => {
+        changeField(event, targetFieldId);
+    };
+    return btn;
+}
+
+/*
+    Campo em sí.
+    Representa um identificador e um valor.
+    
+    Exemplo:
+        EMAIL: exemplodeemail@gmail.com
+    
+    Onde:
+        EMAIL -> identificador
+        exemplodeemail@gmail.com -> valor
+*/
+const field = (id, label, value, is_changeable) => {
+    const fieldContainer = document.createElement('div');
+    fieldContainer.classList.add("field");
+    fieldContainer.id = id;
+    fieldContainer.innerHTML = `
+        <div class="profile-data-row">
+            <div class="data-row-left">
+                <p><span class="value-identifier"><b>${label}</b></span>: <span class="value-itself">${(value && value != '')? value : "undefined"}</span></p>
+            </div>
+            <div class="data-row-right"></div>
+        </div>
+    `;
+
+    if (is_changeable) {
+        const right = fieldContainer.getElementsByClassName("data-row-right")[0];
+        if (right) {
+            right.appendChild(changeButton("Change", id));
+        }
+    }
+
+    return fieldContainer;
+};
+
+
+/*
+    Recebe um objeto endereco, extrai campos relevantes e compacta
+    tudo em uma única string.
+*/
+function formEnderecoString(enderecoObj) {
+    return `${enderecoObj.cidade}/${enderecoObj.estado}, ${enderecoObj.rua} - ${enderecoObj.bairro}, ${enderecoObj.numero}`;
+}
+
+
+/* Renderiza a página de preferências */
+async function renderPreferences() {
+    const renderZone = document.getElementById('render-zone');
+    if (! renderZone) { return; }
+
+    let nome, email, telefone, endereco, cpf = "";
+
+    if (isCliente()) {
+        /* CLIENTE. USAR API clientAPI */
+        const currentUser = getCurrentUser();
+        if (! currentUser) {
+            renderUnknownProblem();
+            return;
+        }
+        
+        const query = await getClientById(currentUser.id);
+        if (! query || ! query.ok) {
+            renderUnknownProblem();
+            return;
+        }
+
+        const raw = query.raw;
+
+        nome = raw.nome ?? null;
+        email = raw.email ?? null;
+        telefone = raw.telefone ?? null;
+        endereco = raw.endereco ?? null;
+        if (endereco) {
+            const query = await getEnderecoById(endereco);
+            if (! query || ! query.ok) {
+                endereco = null;
+            } else {
+                endereco = formEnderecoString(query.raw);
+            }
+        }
+        cpf = raw.cpf ?? null;
+    } else {
+        /* FUNCIONÁRIO. USAR API userAPI */
+        renderUnknownProblem();
+        return;
+    }
+
+    const nomeField 	= field('nome-field', "NOME", nome, true);
+    const emailField 	= field('email-field', "E-MAIL", email, true);
+    const telefoneField	= field('telefone-field', "TELEFONE", telefone, true);
+    const enderecoField	= field('endereco-field', "ENDEREÇO", endereco, true);
+    const cpfField 		= field('cpf-field', "CPF", cpf, true);
+
+    renderZone.innerHTML = '';
+    renderZone.appendChild(nomeField);
+    renderZone.appendChild(emailField);
+    renderZone.appendChild(telefoneField);
+    renderZone.appendChild(enderecoField);
+    renderZone.appendChild(cpfField);
+}
+
+/* Renderiza a página de faturamento */
+async function renderFaturamento() {
+    const renderZone = document.getElementById('render-zone');
+    if (! renderZone) { return; }
+
+    const currentUser = getCurrentUser();
+
+    if (! currentUser) {
+        renderUnknownProblem();
+        return;
+    }
+
+    let billing_address     = "";
+    let billing_email       = "";
+
+    let query = await getDadosFaturamentoByClientId(currentUser.id);
+
+    if (! query.ok || query.raw == null) {
+        renderUnknownProblem();
+        return;
+    }
+
+    billing_address = query.raw.endereco_faturamento;
+    billing_email = query.raw.email_faturamento;
+
+    const enderecoFaturamento   = field('billing-address-field', "Endereço de Faturamento", billing_address, true);
+    const emailFaturamento      = field('billing-email-field', "E-mail de faturamento", billing_email, true);
+
+    renderZone.innerHTML = '';
+    renderZone.appendChild(enderecoFaturamento);
+    renderZone.appendChild(emailFaturamento);
+}
+
+/* Renderiza a página de historico de reservas passadas */
+async function renderHistorico() {
+	
+	// 1. Adicionar a estrutura HTML
+	const renderZone = document.getElementById('render-zone');
+
+    if (! renderZone) {return;}
+
+	const historySection = document.createElement('section');
+    historySection.id = "history-section";
+    historySection.innerHTML = `
+    	<h2 style="margin: 20px; text-align: center; font-weight: 700;">Últimas Reservas</h2>
+        <div id="history"></div>
+    `;
+	
+	renderZone.innerHTML = '';
+	renderZone.appendChild(historySection);
+
+	await loadHistory();
+}
+
+/* 
+    Essa função determina qual render chamar com base em qual menu o usuário clicou.
+    Ex: chama renderHistorico() caso o usuário clique no menu "HISTORICO DE RESERVAS"
+*/
+async function reRender(event) {
+    renderLoading();
+    setActiveMenuRow(event.target.id);
+
+    switch (event.target.id) {
+        case rowsID[0]: {
+            await renderPreferences();
+            break;
+        }
+        case rowsID[1]: {
+            await renderFaturamento();
+            break;
+        }
+        case rowsID[2]: {
+            await renderHistorico();
+            break;
+        }
+        default: {
+            return;
+        }
+    }
 }
 
 export default function renderProfilePage() {
@@ -31,6 +338,8 @@ export default function renderProfilePage() {
     // Redirecionando para /home
     if (! root) {window.location.href = "/home";}
 
+    root.innerHTML = '';
+
     if (navbar) {
         navbar.appendChild(Navbar())
     }
@@ -45,9 +354,7 @@ export default function renderProfilePage() {
         if (problematicFooter) {
             const problematicTags = [];
             problematicFooter.classList.forEach(_class => {
-                if (_class.includes("mt")) {
-                    problematicTags.push(_class);
-                }
+                if (_class.includes("mt")) { problematicTags.push(_class);}
             });
             problematicFooter.classList.remove(problematicTags);
         }
@@ -59,40 +366,29 @@ export default function renderProfilePage() {
     stylesheet.href = "/src/css/profile.css";
     document.head.appendChild(stylesheet);
 
-    root.innerHTML = '';
-
-    const rowsID = ["row-preferences", "row-faturamento", "row-historico"];
-
+    /* Criando cada opção do menu lateral */
     const preferencesRow    = LeftMenuRow(true, 'PREFERÊNCIAS', rowsID[0]);
     const faturamentoRow    = LeftMenuRow(false, 'DADOS DE FATURAMENTO', rowsID[1]);
     const historicoRow      = LeftMenuRow(false, 'HISTÓRICO DE RESERVAS', rowsID[2]);
 
     const rows = [preferencesRow, faturamentoRow, historicoRow];
 
+    /* Criando o menu lateral com todas as opções */
     const leftMenu = LeftMenu("100%", rows);
 
     const menu = document.createElement('div');
     menu.id = "left-menu";
     menu.innerHTML = leftMenu;
-    menu.style.marginTop = "3rem";
-    menu.style.width = "25%";
-    menu.style.height = "500px";
-    menu.style.overflowY = "auto";
-    
+
     root.appendChild(menu);
     root.classList.remove("justify-content-center", "align-items-center");
-    root.style.marginTop = "0";
-    root.style.marginBottom = "0";
-    root.style.flexDirection = "row";
 
 
-    const loading = document.createElement('div');
-    loading.id = 'loading';
-    loading.innerHTML = Loading("200px");
-    loading.style.width = "100%";
-    loading.style.marginTop = "10rem";
+    const renderZone = document.createElement('div');
+    renderZone.id = "render-zone";
+    
+    root.appendChild(renderZone);
 
-    root.appendChild(loading);
 
     let initial_row = null;
     
@@ -108,6 +404,10 @@ export default function renderProfilePage() {
 
     });
     
+    /*
+        Simulando o click na opção marcaca por padrão como selecionada. [opção: PREFERÊNCIAS].
+        Isso irá indiretamente chamar a função reRender para renderizar o conteúdo da página de preferências.
+    */
     if (initial_row != null) {
         initial_row.click();
     }
