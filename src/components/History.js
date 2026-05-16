@@ -1,38 +1,29 @@
+import { getCurrentUser, isCliente } from "../api/authAPI.js";
+import { getReservationHistoryByClientId } from "../api/historyAPI.js";
+
 export async function loadHistory() {
 
     const section = document.getElementById("history-section");
     const container = document.getElementById('history');
     
-    
-    const token = localStorage.getItem("auth_token");
-    //console.log("TOKEN:", token);
-    //const logado = localStorage.getItem("logado");
-
-     if (!token) {
-        section.style.display = "none";
-        return;  
+	if (! isCliente()) {
+        container.innerHTML = `<p style="margin: 10px; color: red;">Somente clientes possuem histórico de reserva</p>`;
+        return;
     }
 
-    section.style.display = "block";
+    const currentUser = getCurrentUser();
+    if (! currentUser) {
+        container.innerHTML = `<p style="margin: 10px; color: red;">Um erro inesperado ocorreu. Verifique se você está logado no sistema</p>`;
+        return;
+    }
+	
+	const history = await getReservationHistoryByClientId(currentUser.id);
+	if (! history.ok) {
+        container.innerHTML = `<p>Não foi possivel obter o histórico de reservas. Mensagem deixada pelo servidor: ${history.message}</p>`;
+        return;
+    }
 
-    try {
-        
-        const response = await fetch('/grandehotelsenac2/api/history', {
-          //  method: 'GET',
-            headers: {
-                Authorization: 'Bearer ' + token
-            //    'Content-Type': 'Application/json'
-        }
-        });
-
-        const data = await response.json();
-
-        if (response.status === 401) {
-            section.style.display = "none";
-            console.error("Usuário não autorizado");
-            return;
-        }
-    
+    const data = history.raw;
         
     if (!data || data.length === 0) {
         container.innerHTML = `<p style="margin: 10px">Nenhuma reserva encontrada</p>`;
@@ -57,6 +48,7 @@ export async function loadHistory() {
             padding: 5px 15px;">
             Repetir
             </button>
+            <a class="btn-nfse" href="/nfse/servico/${res.id}">GERAR NFS-e</a>
         </div>
     `).join('');
 
@@ -65,23 +57,13 @@ export async function loadHistory() {
                 const room_id = btn.dataset.room;
                 const checkin = btn.dataset.checkin;
                 const checkout = btn.dataset.checkout;
-
-                console.log("Clicou repetir:", room_id, checkin, checkout);
-
                 const reservationData = { room_id, checkin, checkout };
 
                 localStorage.setItem("repeatReservation", JSON.stringify(reservationData));
                 console.log(localStorage.getItem("repeatReservation"));
 
-              //  alert("Salvou a reserva!");
-
-                window.location.href = "/grandehotelsenac2/home";
+                window.location.href = "/home";
         })
-    })    
-    
-    } catch (error) {
-        console.error("Erro ao carregar histórico:", error);
-        container.innerHTML = `<p style="color: red;">Erro ao carregar as reservas</p>`
-    }
+    });
 
 }

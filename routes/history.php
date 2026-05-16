@@ -1,42 +1,69 @@
 <?php
-require_once "helpers/token_jwt.php";
-require_once "helpers/response.php";
+require_once __DIR__ . "/../helpers/token_jwt.php";
+require_once __DIR__ . "/../helpers/response.php";
+require_once __DIR__ . "/../controllers/HistoryController.php";
 
-global $conn;
+$subroute = $segments[2] ?? null;
+$subsubroute = $segments[3] ?? null;
 
-// Pegar headers da requisição
-$headers = getallheaders();
-
-// Se não tiver token
-if(!isset($headers['Authorization'])) {
-    return jsonResponse(['error' => 'Token não enviado'], 401);
+if (! isset($subroute)) {
+    return jsonResponse([
+        "status" => "error",
+        "message" => "Sub rota ou ID faltando"
+    ], 400);
 }
 
-// Extrair token
-$token = str_replace('Bearer ', '', $headers['Authorization']);
-
-// Validar token
-$decoded = validateToken($token);
-
-if(!$decoded) {
-    return jsonResponse(['error' => 'Token inválido'], 401);
+function subRouteCliente() {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    	global $conn;
+    	global $subsubroute;
+		$user_id = $subsubroute;
+		
+		if (! isset($user_id)) {
+        	return jsonResponse([
+            	"status" => "error",
+            	"message" => "ID do cliente faltando"
+        	], 400);
+    	}
+		
+		HistoryController::getReservationHistoryByClientId($conn, $user_id);
+    } else {
+        return jsonResponse([
+            "status" => "error",
+            "message" => "Método não permitido"
+        ], 405);
+    }
 }
 
-$user_id = $decoded['id'];
+function defaultRoute() {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
+    	global $subroute;
+        global $conn;
+    	$reservationId = $subroute;
 
-$sql = "SELECT * FROM reservations WHERE user_id = ? ORDER BY create_at DESC";
+    	if (! isset($reservationId)) {
+        	return jsonResponse([
+            	"status" => "error",
+            	"message" => "ID da reserva faltando!"
+        	], 400);
+    	}
+		HistoryController::getReservationHistoryById($conn, $reservationId);
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-
-$result = $stmt->get_result();
-
-$reservations = [];
-
-while ($row = $result->fetch_assoc()) {
-    $reservations[] = $row;
+    } else {
+        return jsonResponse([
+            "status" => "error",
+            "message" => "Método não permitido"
+        ], 405);
+    }
 }
 
-return jsonResponse($reservations);
+switch ($subroute) {
+	case "cliente": {
+        subRouteCliente();
+    }
+    default: {
+        defaultRoute();
+    }
+}
+

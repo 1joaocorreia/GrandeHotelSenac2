@@ -83,3 +83,12 @@
     padding: 30px;
 }
 
+.btn-nfse {
+    background-color: #FFF;
+    color: #000;
+    border: 1px solid #CCC;
+    border-radius: 10px; 
+	padding: 7px;
+    text-decoration: none;
+}
+
