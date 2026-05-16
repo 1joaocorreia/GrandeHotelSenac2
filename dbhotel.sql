@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 12, 2026 at 08:53 PM
+-- Generation Time: May 16, 2026 at 10:46 PM
 -- Server version: 11.8.1-MariaDB-4
 -- PHP Version: 8.4.8
 
@@ -21,8 +21,14 @@ SET time_zone = "+00:00";
 -- Database: `dbhotel`
 --
 
+--
+-- Criação do banco de dados `dbhotel`
+--
 CREATE DATABASE IF NOT EXISTS dbhotel;
 
+--
+-- Selecionando o banco de dados `dbhotel`
+--
 USE dbhotel;
 
 -- --------------------------------------------------------
@@ -83,11 +89,41 @@ CREATE TABLE `clientes` (
   `nome` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `telefone` varchar(255) DEFAULT NULL,
+  `endereco` int(11) NOT NULL,
   `cpf` varchar(255) NOT NULL,
   `senha` varchar(255) NOT NULL,
   `cargo_id` int(11) NOT NULL DEFAULT 3
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `enderecos`
+--
+
+CREATE TABLE `enderecos` (
+  `id` int(11) NOT NULL,
+  `cep` text NOT NULL,
+  `rua` text NOT NULL,
+  `numero` int(11) NOT NULL,
+  `bairro` text NOT NULL,
+  `cidade` text NOT NULL,
+  `estado` text NOT NULL,
+  `complemento` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `faturamento`
+--
+
+CREATE TABLE `faturamento` (
+  `id` int(11) NOT NULL,
+  `client_id` int(11) NOT NULL,
+  `endereco_faturamento` text NOT NULL,
+  `email_faturamento` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -125,7 +161,6 @@ CREATE TABLE `notas_fiscais` (
   `servico_consumido` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
-
 -- --------------------------------------------------------
 
 --
@@ -139,7 +174,6 @@ CREATE TABLE `pedidos` (
   `pagamento` enum('débito','crédito','pix') NOT NULL,
   `data` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 -- --------------------------------------------------------
 
@@ -156,7 +190,6 @@ CREATE TABLE `quartos` (
   `preco` double NOT NULL,
   `disponivel` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 -- --------------------------------------------------------
 
@@ -176,6 +209,21 @@ CREATE TABLE `reservas` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `reservations`
+--
+
+CREATE TABLE `reservations` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL,
+  `checkin` date NOT NULL,
+  `checkout` date NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `usuarios`
 --
 
@@ -187,6 +235,9 @@ CREATE TABLE `usuarios` (
   `cargo_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Indexes for dumped tables
+--
 
 --
 -- Indexes for table `adicionais`
@@ -217,7 +268,21 @@ ALTER TABLE `cargos`
 ALTER TABLE `clientes`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `id` (`id`),
-  ADD KEY `cargo_id` (`cargo_id`);
+  ADD KEY `cargo_id` (`cargo_id`),
+  ADD KEY `endereco` (`endereco`);
+
+--
+-- Indexes for table `enderecos`
+--
+ALTER TABLE `enderecos`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `faturamento`
+--
+ALTER TABLE `faturamento`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `client_id` (`client_id`);
 
 --
 -- Indexes for table `imagens`
@@ -268,6 +333,14 @@ ALTER TABLE `reservas`
   ADD KEY `adicional_id` (`adicional_id`);
 
 --
+-- Indexes for table `reservations`
+--
+ALTER TABLE `reservations`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `room_id` (`room_id`);
+
+--
 -- Indexes for table `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -301,7 +374,19 @@ ALTER TABLE `cargos`
 -- AUTO_INCREMENT for table `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `enderecos`
+--
+ALTER TABLE `enderecos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `faturamento`
+--
+ALTER TABLE `faturamento`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `imagens`
@@ -325,7 +410,7 @@ ALTER TABLE `pedidos`
 -- AUTO_INCREMENT for table `quartos`
 --
 ALTER TABLE `quartos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `reservas`
@@ -334,10 +419,16 @@ ALTER TABLE `reservas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `reservations`
+--
+ALTER TABLE `reservations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
