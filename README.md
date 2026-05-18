@@ -2,7 +2,7 @@
 
 > Este repositório é uma continuação de [Projeto_Integrador-Senac (repositório)](https://github.com/joaovitordias13/Projeto_Integrador-Senac)
 
-Aplicação web full stack para gerenciamento de reservas do **Grande Hotel Senac**, composta por:
+Aplicação web full stack para gerenciamento de reservas do **Grande Hotel Senac 2**, composta por:
 
 - **Front-end SPA** em HTML, CSS (Bootstrap + estilo próprio) e JavaScript modular.
 - **Back-end em PHP** com rotas REST simples.
@@ -22,7 +22,7 @@ Visão geral das principais pastas e arquivos:
   Front controller da aplicação em PHP.  
   - Encaminha requisições para:
     - `public/index.html` (front-end SPA) quando a rota **não** é `/api`.
-    - Arquivos em `routes/` quando a rota começa com `/api/...`.
+    - Arquivos em `routes/api` quando a rota começa com `/api/...`.
 
 - `dbhotel.sql`  
   Script de criação e povoamento do banco **`dbhotel`**.
@@ -43,14 +43,7 @@ Visão geral das principais pastas e arquivos:
   - `helpers/jwt/` – biblioteca JWT (Firebase PHP JWT).
 
 - `routes/`  
-  Definição das rotas da API:
-  - `login.php`
-  - `rooms.php`
-  - `reserve.php`
-  - `client.php`
-  - `addon.php`
-  - `request.php`
-  - `upload.php`
+  Definição das rotas da API
 
 - `public/`
   - `index.html` – página base do front-end SPA.
@@ -58,12 +51,12 @@ Visão geral das principais pastas e arquivos:
 
 - `src/`
   - `src/main.js` – roteador simples em JavaScript que renderiza as páginas da SPA.
-  - `src/pages/` – páginas principais (`Home.js`, `Login.js`, `Register.js`, `Rooms.js`, `Cart.js`).
+  - `src/pages/` – páginas principais.
   - `src/components/` – componentes reutilizáveis (Navbar, Hero, cards, modais, seletor de datas etc.).
-  - `src/api/` – funções de acesso à API (`authAPI.js`, `roomsAPI.js`, `clientAPI.js`, `reserveAPI.js`).
+  - `src/api/` – funções de acesso à API.
   - `src/store/CartStore.js` – controle do carrinho de reservas no front.
-  - `src/css/global.css` – estilos customizados da aplicação.
-
+  - `src/css/` – estilos customizados da aplicação.
+  
 - `uploads/`
   Pasta de upload de imagens (ex.: fotos de quartos).
 
@@ -96,6 +89,11 @@ Visão geral das principais pastas e arquivos:
 - **Upload de Imagens**
   - Endpoint dedicado para upload de imagens de quartos/estrutura do hotel.
 
+- **Geração de Nota Fiscal de Serviço Eletrônico (NFS-e)**
+  - Geração de NFS-e para reservas salvas no histórico
+
+- **Página de Perfil do Usuário: Acesso e Modificação de Dados**
+  - Permite o usuário visualizar seus próprios dados e modifica-los
 ---
 
 ## 🏗 Arquitetura da Aplicação
@@ -119,7 +117,7 @@ Visão geral das principais pastas e arquivos:
   - `src/css/global.css`.
   - `src/main.js` como módulo ES.
 - `src/main.js`:
-  - Define as rotas da SPA (`/home`, `/login`, `/register`, `/cart`, `/room`).
+  - Define as rotas da SPA (`/home`, `/login`, `/register`, `/cart`, `/room`, etc.).
   - Identifica o caminho atual com `location.pathname` e renderiza a página correspondente.
 - Cada página em `src/pages/` constrói dinamicamente o DOM usando componentes em `src/components/`.
 - Comunicação com a API via `fetch`, centralizada nos arquivos de `src/api/`.
@@ -160,6 +158,10 @@ Visão geral das principais pastas e arquivos:
 
 ## ⚙️ Configuração do Ambiente
 
+### Linux
+- Instruções para [Linux](instructions/linux.txt)
+
+### Windows
 1. **Clonar ou copiar o projeto**
 
    Coloque a pasta do projeto dentro do diretório público do seu servidor web.  
@@ -183,18 +185,32 @@ Visão geral das principais pastas e arquivos:
    - `DB_NAME` – deve ser `dbhotel` (como no script).
    - `SECRET_KEY` – chave secreta usada para assinatura dos tokens JWT.
 
-4. **Verificar `.htaccess`**
-
-   O arquivo `.htaccess` está configurado com:
-
-   - `RewriteBase /grandehotelsenac/`
-
-   Se a pasta do projeto tiver outro nome ou for publicada em outro caminho, ajuste essa linha para refletir o novo path.
 
 ---
 
 ## ▶️ Executando o Projeto
 
+### Linux
+Se você seguiu as instruções para Linux:
+
+1. Inicie o Apache
+	`sudo systemctl start apache2`
+2. Inicie o MariaDB
+	`sudo systemctl start mariadb`
+3. Acesse no navegador:
+	`http://grandehotelsenac2.com/`
+
+   Isso carregará a SPA em `public/index.html` via `index.php`.
+
+4. A API estará disponível em rotas como:
+
+   - `http://grandehotelsenac2.com/api/login`
+   - `http://grandehotelsenac2.com/api/rooms`
+   - `http://grandehotelsenac2.com/api/reserve`
+   - etc.
+
+
+### Windows
 1. Inicie Apache e MySQL/MariaDB.
 2. Acesse no navegador:
 
@@ -213,7 +229,7 @@ Visão geral das principais pastas e arquivos:
 
 ## 🌐 Principais Endpoints da API
 
-Os endpoints são definidos em `routes/` e consumidos pelos arquivos em `src/api/`.
+Os endpoints são definidos em `routes/api` e consumidos pelos arquivos em `src/api/`.
 
 - `POST /api/login`  
   - Autentica usuário (cliente ou funcionário).

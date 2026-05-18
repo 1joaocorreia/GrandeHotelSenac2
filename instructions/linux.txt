@@ -1,0 +1,97 @@
+1. Download
+
+Faça o download do repositório:
+    git clone https://github.com/1joaocorreia/GrandeHotelSenac2.git
+
+
+---------------------------------------------------------------------------------
+
+
+2. Configuração de Host Apache
+
+Visite o diretório /etc/apache2/sites-available:
+    cd /etc/apache2/sites-available
+
+
+Crie o arquivo de configuração:
+    sudo touch grandehotelsenac.conf
+
+
+Modifique o arquivo (use o editor de texto de sua preferência, no meu caso estou usando o Micro, mas você pode usar o Nano ou Vim):
+    sudo micro grandehotelsenac.conf
+
+Adicione:
+<VirtualHost *:80>
+
+	DocumentRoot <path_repositório>
+
+	ServerName grandehotelsenac2
+	ServerAlias grandehotelsenac2.com
+	DirectoryIndex index.php
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    <Directory <path_repositório> >
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+</VirtualHost>
+
+
+
+
+==========
+| AVISO! |
+==========
+SUBSTITUA <path_repositório> pelo path para o repositório!
+Exemplo:
+    Se você baixou o repositório na localização ~/Downloads/GrandeHotelSenac2, então você deve colocar:
+        DocumentRoot "~/Downloads/GrandeHotelSenac2"
+
+
+---------------------------------------------------------------------------------
+
+
+3. Habilitar a configuração do Host Apache
+
+Execute:
+    sudo a2ensite grandehotelsenac.conf
+
+
+Nota: a2ensite é um utilitário fornecido pelo próprio servidor Apache.
+
+---------------------------------------------------------------------------------
+
+
+4. Modificar o arquivo de hosts
+
+    sudo micro /etc/hosts
+
+
+Adicione:
+
+127.0.0.1   grandehotelsenac2
+127.0.0.1   grandehotelsenac2.com
+
+
+Isso fará com que o navegador traduza "http://grandehotelsenac2.com" para http://127.0.0.1, que é o endereço do localhost.
+
+---------------------------------------------------------------------------------
+
+
+5. Copie o Banco de Dados
+(Não vou cobrir os passos para instalar o MariaDB aqui, você pode obter isso na página oficial.)
+(Também não vou cobrir os passos para instalar o phpMyAdmin)
+
+
+Importe o arquivo dbhotel.sql usando o phpMyAdmin ou via terminal
+
+
+==========
+| AVISO! |
+==========
+Se o seu banco de dados exigir senha, coloque a senha em config/config.php, no macro "DB_PASS".
+
+---------------------------------------------------------------------------------
