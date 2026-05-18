@@ -2,7 +2,7 @@ export async function createClient(nome, cpf, telefone, email, senha) {
     const dados = { nome, cpf, telefone, email, senha };
 
     try {
-        const response = await fetch("api/client", {
+        const response = await fetch("/api/client", {
             method: "POST",
             headers: {
                 "Accept": "application/json",

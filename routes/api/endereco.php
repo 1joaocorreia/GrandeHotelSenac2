@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . "/../helpers/response.php";
-require_once __DIR__ . "/../controllers/EnderecoController.php";
+require_once __DIR__ . "/../../helpers/response.php";
+require_once __DIR__ . "/../../controllers/EnderecoController.php";
 
 global $segments;
 $subroute = $segments[2];

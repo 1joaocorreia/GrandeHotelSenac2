@@ -9,6 +9,13 @@ class FaturamentoModel {
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
+	
+	public static function updateSingle($conn, $column, $data, $cond, $condval) {
+        $sql = "UPDATE faturamento SET $column = ? WHERE $cond";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $data, $condval);
+        return $stmt->execute();
+    }
 
 }
 

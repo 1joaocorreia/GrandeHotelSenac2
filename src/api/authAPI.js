@@ -1,5 +1,5 @@
 const TOKEN_KEY = "auth_token";
-const LOGIN_URL = "api/login";
+const LOGIN_URL = "/api/login";
 
 export async function loginRequest(email, senha, tipo) {
     const response = await fetch(LOGIN_URL, {

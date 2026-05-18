@@ -2,7 +2,7 @@ import { addItemToHotelCart } from "../store/CartStore.js";
 import CarrouselCard from "./CarrouselCard.js";
 import { showModal } from "./Modal.js";
 
-function showAddedToCartModal({ nome, preco, daily, subtotal }) {
+export function showAddedToCartModal({ nome, preco, daily, subtotal }) {
     const modal = document.createElement("div");
     modal.className = "modal fade show d-block";
     modal.style.backgroundColor = "rgba(0,0,0,0.5)";
@@ -49,7 +49,7 @@ function showAddedToCartModal({ nome, preco, daily, subtotal }) {
     btnContinue.addEventListener("click", close);
     btnGoCart.addEventListener("click", () => {
         close();
-        window.location.href = "cart";
+        window.location.href = "/cart";
     });
 
     modal.addEventListener("click", (e) => {
@@ -59,7 +59,7 @@ function showAddedToCartModal({ nome, preco, daily, subtotal }) {
 
 
 
-function calcularDiaria(checkIn, checkOut) {
+export function calcularDiaria(checkIn, checkOut) {
     const [yin, min, din] = String(checkIn).split("-").map(Number);
     const [yout, mout, dout] = String(checkOut).split("-").map(Number);
 

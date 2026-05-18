@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../controllers/ClientController.php";
+require_once __DIR__ . "/../../controllers/ClientController.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET'){
     $id =  $segments[2] ?? null;
@@ -35,17 +35,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET'){
     
 
 }elseif ($_SERVER['REQUEST_METHOD'] === "PUT"){  
-    validateTokenAPI('ADM');
-    $data = json_decode(file_get_contents('php://input'), true);
-    $id =  $data['id'];
-    
-    if(isset($data)){
-        ClientController::update($conn, $id, $data);
-    }else{
-        jsonResponse(['message'=>"Atributos invalidos"], 400);
+	$id =  $segments[2] ?? null;
+    if (! isset($id)) {
+        return jsonResponse([
+            "status" => "error",
+            "message" => "ID faltando"
+        ], 400);
     }
-
+	$data = json_decode(file_get_contents('php://input'), true);
+    $valid = false;
+    foreach ($data as $key => $value) {
+        if (in_array($key, ["id", "nome", "email", "telefone", "endereco", "cpf", "senha"])) {
+            $valid = true;
+        } else {
+            $valid = false;
+        }
+		if (! $valid) {
+            return jsonResponse([
+                "status" => "error",
+                "message" => "Campo invalido para alteração"
+            ], 403);
+        }
+    }
     
+	ClientController::updateInterpret($conn, $data, "id = ?", $id);
+
 }
 else{
     jsonResponse([

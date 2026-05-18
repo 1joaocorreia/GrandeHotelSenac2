@@ -49,7 +49,15 @@ class ReserveModel{
         $stmt->close();
 
         return $isReserved;
-        }
+    }
+
+    public static function getReserveByRoomId($conn, $roomId) {
+        $sql = "SELECT * FROM reservas WHERE quarto_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $roomId);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
 
 }
 ?>

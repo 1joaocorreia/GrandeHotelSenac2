@@ -29,12 +29,12 @@ export default function Navbar() {
                     ` : ""}
                     ${!user ? `
                     <li class="nav-item">
-                        <a class="nav-link" href="register">Cadastre-se</a>
+                        <a class="nav-link" href="/register">Cadastre-se</a>
                     </li>
                     ` : ""}
                     ${!user ? `
                     <li class="nav-item">
-                        <a class="nav-link" href="login">Faça seu login</a>
+                        <a class="nav-link" href="/login">Faça seu login</a>
                     </li>
                     ` : `
                     <li class="nav-item">
@@ -61,7 +61,7 @@ export default function Navbar() {
         logoutLink.addEventListener("click", function (e) {
             e.preventDefault();
             clearToken();
-            window.location.href = "home";
+            window.location.href = "/home";
         });
     }
 

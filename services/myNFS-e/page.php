@@ -45,13 +45,13 @@ function calcular_valor_total($obj) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nota Fiscal de Serviço Eletrônica</title>
-    <link rel="stylesheet" href="http://www.grandehotelsenac.com/services/myNFS-e/style.css">
+    <link rel="stylesheet" href="http://grandehotelsenac2.com/services/myNFS-e/style.css"></link>
 </head>
 <body>
     <div id="main-field">
         <div id="nfse-header">
         	<div id="nfse-header-logo">
-	            <img src="http://www.grandehotelsenac.com/services/myNFS-e/data/hotel_logo.png" alt="Logo do Grande Hotel Senac" id="logo">
+	            <img src="http://grandehotelsenac2.com/services/myNFS-e/data/hotel_logo.png" alt="Logo do Grande Hotel Senac" id="logo">
 	            <h1 style="font-size: 14px; text-align: center;">Grande Hotel Senac</h1>
             </div>
             <h1 style="font-size: 28px; margin-left: 2rem; margin-right: 2rem; border: 1px dashed black; padding: 4rem; background-color: lightgray;">Nota Fiscal de Serviços Eletrônicos</h1>

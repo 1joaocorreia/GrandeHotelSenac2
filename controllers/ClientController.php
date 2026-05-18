@@ -50,5 +50,31 @@ class ClientController{
             return jsonResponse(['message'=> 'Ocorreu um erro ao procesar a operação.'], 400);        }
     }
 
+	public static function updateInterpret($conn, $data, $cond, $condval) {
+        if (! isset($conn) || ! isset($data) || ! isset($cond) || ! isset($condval)) {
+            return jsonResponse([
+                "status" => "error",
+                "message" => "Erro interno no servidor"
+            ], 500);
+        }
+
+		foreach ($data as $column => $value) {
+
+			if (ClientModel::updateSingle($conn, $column, $value, $cond, $condval) === false) {
+                return jsonResponse([
+                    "status" => "error",
+                    "message" => "Não foi possivel atualizar a coluna $column"
+                ], 500);
+            }
+
+        }
+		
+		return jsonResponse([
+            "status" => "success",
+            "message" => "Dados alterados com sucesso"
+        ], 200);
+
+    }
+
 }
 ?>

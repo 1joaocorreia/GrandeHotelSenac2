@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../controllers/RequestController.php";
+require_once __DIR__ . "/../../controllers/RequestController.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET'){
     $id =  $segments[2] ?? null;

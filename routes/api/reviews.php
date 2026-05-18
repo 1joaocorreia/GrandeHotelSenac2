@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . "/../helpers/response.php";
-require_once __DIR__ . "/../controllers/ReviewController.php";
+require_once __DIR__ . "/../../helpers/response.php";
+require_once __DIR__ . "/../../controllers/ReviewController.php";
 
 function subRouteRooms($conn, $roomId) {
 	if (! isset($roomId)) {

@@ -21,6 +21,16 @@ class HistoryModel {
 
 		return $stmt->get_result()->fetch_assoc();
 	}
+	
+	public static function getReservationHistoryByClientIdAndRoomId($conn, $clientId, $roomId) {
+		$sql = "SELECT * FROM reservations WHERE user_id = ? AND room_id = ?";
+		
+		$stmt = $conn->prepare($sql);
+		$stmt->bind_param("ii", $clientId, $roomId);
+		$stmt->execute();
+
+		return $stmt->get_result()->fetch_assoc();
+	}
 
 }
 

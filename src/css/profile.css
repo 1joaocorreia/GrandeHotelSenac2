@@ -92,3 +92,6 @@
     text-decoration: none;
 }
 
+.btn-nfse:hover {
+    cursor: pointer;
+}

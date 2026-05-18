@@ -7,7 +7,7 @@ export async function listAllRoomRequest({ inicio, fim, capacidadeTotal }) {
     if (capacidadeTotal !== null && capacidadeTotal !== "") params.set("capacidadeTotal", String(capacidadeTotal));
 
 
- const url = `api/rooms/disponiveis?${params.toString()}`;
+ const url = `/api/rooms/disponiveis?${params.toString()}`;
     const response = await fetch(url, {
         method: "GET",
         headers: {

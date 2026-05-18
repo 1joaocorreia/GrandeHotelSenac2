@@ -16,7 +16,7 @@ export default function renderLoginPage() {
 
     const linkVoltar = document.createElement('a');
     linkVoltar.textContent = "Não possui uma conta? Crie uma!";
-    linkVoltar.href = 'register';
+    linkVoltar.href = '/register';
     linkVoltar.style.textAlign = 'center';
     linkVoltar.style.fontSize = '16px';
     linkVoltar.style.padding = '15px';
@@ -110,9 +110,9 @@ export default function renderLoginPage() {
                     const redirect = sessionStorage.getItem("redirectAfterLogin");
                     if (redirect) {
                         sessionStorage.removeItem("redirectAfterLogin");
-                        window.location.href = redirect;   // ex: "cart"
+                        window.location.href = "/redirect";   // ex: "cart"
                     } else {
-                        window.location.href = "home";
+                        window.location.href = "/home";
                     }
                 }, 800);
             } else {

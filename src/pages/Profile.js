@@ -1,4 +1,4 @@
-import { getCurrentUser, isCliente } from "../api/authAPI.js";
+import { getCurrentUser, isCliente, getToken } from "../api/authAPI.js";
 import { getClientById } from "../api/clientAPI.js";
 import { getDadosFaturamentoByClientId } from "../api/faturamentoAPI.js";
 import { getEnderecoById } from "../api/enderecoAPI.js";
@@ -45,6 +45,20 @@ function renderLoading() {
     const renderZone = document.getElementById('render-zone');
     if (! renderZone) { return; }
     renderZone.innerHTML = Loading("200px");
+}
+
+async function redirectNfse(event) {
+    const roomId = event.srcElement.getAttribute('data-room');
+   	return fetch(`/nfse/quarto/${roomId}`, {
+        headers: {
+            Authorization: `Bearer ${getToken()}`
+        }
+    })
+    .then( response => response.blob() )
+    .then( blob => {
+		var file = window.URL.createObjectURL(blob);
+        window.location.assign(file);
+    });
 }
 
 async function askUserFieldValue(label, oldValue) {
@@ -95,6 +109,7 @@ async function changeField(event, fieldId) {
     };
 
     if(! idsAndColumns.hasOwnProperty(fieldId)) {
+        console.error("fieldId não reconhecido");
         renderUnknownProblem();
         return;
     }
@@ -102,6 +117,7 @@ async function changeField(event, fieldId) {
     const element = document.getElementById(fieldId);
     
     if (! element) {
+        console.error(`Elemento com ID < ${fieldId} > não encontrado`);
         renderUnknownProblem();
         return;
     }
@@ -118,13 +134,88 @@ async function changeField(event, fieldId) {
     } catch (err) {
         newValue = null;
     }
+	
+	if (newValue == null) { return; }
 
-    console.log(`
-        Values for: < ${label} >
-        OLD: ${oldValue}
-        NEW: ${newValue ?? "undefined"}
-    `);
+	const currentUser = getCurrentUser();
+	
+	if (! currentUser) {
+        console.error("Não foi possível obter os dados do usuário atual");
+		renderUnknownProblem();
+        return;
+    }
 
+    const detailedUser = await getClientById(currentUser.id);
+    if (! detailedUser.ok || ! detailedUser.raw) {
+        console.error(`Falha ao requisitar os dados do cliente com ID: ${currentUser.id}`);
+        renderUnknownProblem();
+        return;
+    }
+	const userAddress = (detailedUser.raw.endereco) ? await getEnderecoById(detailedUser.raw.endereco) : null;
+	
+	const rotas = {
+        "cliente": `/api/client/${detailedUser.raw.id}`,
+        "faturamento": `/api/faturamento/cliente/${detailedUser.raw.id}`
+    };
+	
+    console.log("rotas:");
+    console.log(rotas);
+
+	let choosenRoute = null;
+
+    if (["nome-field", "email-field", "telefone-field", "endereco-field", "cpf-field"].includes(fieldId)) {
+        choosenRoute = rotas.cliente;
+    }
+    if (["billing-address-field", "billing-email-field"].includes(fieldId)) {
+        choosenRoute = rotas.faturamento;
+    }
+	
+    const method = 'PUT';
+    const choosenId = idsAndColumns[fieldId];
+	const authToken = getToken();
+    
+	if (! authToken) {
+        console.log("Token indisponível");
+        renderUnknownProblem();
+        return;
+    }
+
+	console.log(`Requesting < ${choosenRoute} >. [Method ${method}] ${choosenId}:${newValue}`);
+	
+    // TODO: Include Authorization Token
+    // Authorizaton: Bearer <token>
+    const response = await fetch(choosenRoute, {
+        method: method,
+        body: `{"${choosenId}": "${newValue}"}`,
+        headers: {
+            "Authorization": `Bearer ${authToken}`
+        }
+    });
+    
+	if (! response.ok) {
+		renderUnknownProblem();
+        return;
+    }
+
+    let data = null;
+    try {
+        data = await response.json();
+    } catch (ex) {
+        data = null;
+    }
+
+	if (data == null) {
+		renderUnknownProblem();
+        return;
+    }
+	
+	if (data.status === "success") {
+        location.reload();
+        return;
+    } else {
+        renderUnknownProblem();
+        return;
+    }   	
 }
 
 /* 
@@ -176,15 +267,6 @@ const field = (id, label, value, is_changeable) => {
 };
 
 
-/*
-    Recebe um objeto endereco, extrai campos relevantes e compacta
-    tudo em uma única string.
-*/
-function formEnderecoString(enderecoObj) {
-    return `${enderecoObj.cidade}/${enderecoObj.estado}, ${enderecoObj.rua} - ${enderecoObj.bairro}, ${enderecoObj.numero}`;
-}
-
-
 /* Renderiza a página de preferências */
 async function renderPreferences() {
     const renderZone = document.getElementById('render-zone');
@@ -217,7 +299,7 @@ async function renderPreferences() {
             if (! query || ! query.ok) {
                 endereco = null;
             } else {
-                endereco = formEnderecoString(query.raw);
+                endereco = query.raw.cep;
             }
         }
         cpf = raw.cpf ?? null;
@@ -230,7 +312,7 @@ async function renderPreferences() {
     const nomeField 	= field('nome-field', "NOME", nome, true);
     const emailField 	= field('email-field', "E-MAIL", email, true);
     const telefoneField	= field('telefone-field', "TELEFONE", telefone, true);
-    const enderecoField	= field('endereco-field', "ENDEREÇO", endereco, true);
+    const enderecoField	= field('endereco-field', "ENDEREÇO (CEP)", endereco, true);
     const cpfField 		= field('cpf-field', "CPF", cpf, true);
 
     renderZone.innerHTML = '';
@@ -258,14 +340,12 @@ async function renderFaturamento() {
 
     let query = await getDadosFaturamentoByClientId(currentUser.id);
 
-    if (! query.ok || query.raw == null) {
-        renderUnknownProblem();
-        return;
+    billing_address = null;
+    billing_email = null;
+    if (query.ok && query.raw) {
+        billing_address = query.raw.endereco_faturamento ?? null;
+        billing_email = query.raw.email_faturamento ?? null;
     }
-
-    billing_address = query.raw.endereco_faturamento;
-    billing_email = query.raw.email_faturamento;
-
     const enderecoFaturamento   = field('billing-address-field', "Endereço de Faturamento", billing_address, true);
     const emailFaturamento      = field('billing-email-field', "E-mail de faturamento", billing_email, true);
 
@@ -293,6 +373,10 @@ async function renderHistorico() {
 	renderZone.appendChild(historySection);
 
 	await loadHistory();
+
+	for (let element of document.getElementsByClassName('btn-nfse')) {
+        element.addEventListener('click', redirectNfse);
+    }
 }
 
 /* 

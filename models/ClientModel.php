@@ -48,6 +48,13 @@ class ClientModel{
         return $stmt->execute();
     }
 
+    public static function updateSingle($conn, $column, $data, $cond, $condval) {
+        $sql = "UPDATE clientes SET $column = ? WHERE $cond";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $data, $condval);
+        return $stmt->execute();
+    }
+
     public static function ClientValidation($conn,$email,$pass){
         
         $sql = "SELECT clientes.id, clientes.email, clientes.senha, clientes.nome, cargos.nome AS cargo 

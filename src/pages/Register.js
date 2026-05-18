@@ -121,9 +121,9 @@ export default function renderRegisterPage() {
                         const redirect = sessionStorage.getItem("redirectAfterLogin");
                         if (redirect) {
                             sessionStorage.removeItem("redirectAfterLogin");
-                            window.location.href = redirect;
+                            window.location.href = "/redirect";
                         } else {
-                            window.location.href = "home";
+                            window.location.href = "/home";
                         }
                     }, 800);
                 } else {

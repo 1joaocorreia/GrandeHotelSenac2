@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . "/../controllers/RoomController.php";
-require_once __DIR__ . "/../helpers/token_jwt.php";
+require_once __DIR__ . "/../../controllers/RoomController.php";
+require_once __DIR__ . "/../../helpers/token_jwt.php";
 
 if ($_SERVER['REQUEST_METHOD'] === "GET") {
     $id = $segments[2] ?? null;

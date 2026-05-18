@@ -48,7 +48,7 @@ export async function loadHistory() {
             padding: 5px 15px;">
             Repetir
             </button>
-            <a class="btn-nfse" href="/nfse/servico/${res.id}">GERAR NFS-e</a>
+            <a class="btn-nfse" data-room="${res.room_id}">GERAR NFS-e</a>
         </div>
     `).join('');
 

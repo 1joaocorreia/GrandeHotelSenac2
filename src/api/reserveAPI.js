@@ -1,7 +1,7 @@
 import { getToken } from "../api/authAPI.js";
 
 export async function finishedOrder(items, metodoPagamento) {
-    const url = "api/request/reservation";
+    const url = "/api/request/reservation";
     const body = {
         pagamento: metodoPagamento,
         quartos: items.map(item => ({

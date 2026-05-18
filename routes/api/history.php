@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . "/../helpers/token_jwt.php";
-require_once __DIR__ . "/../helpers/response.php";
-require_once __DIR__ . "/../controllers/HistoryController.php";
+require_once __DIR__ . "/../../helpers/token_jwt.php";
+require_once __DIR__ . "/../../helpers/response.php";
+require_once __DIR__ . "/../../controllers/HistoryController.php";
 
 $subroute = $segments[2] ?? null;
 $subsubroute = $segments[3] ?? null;

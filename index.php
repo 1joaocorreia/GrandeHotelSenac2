@@ -19,14 +19,9 @@ $route = $segments[0] ?? null;
 $subRoute = $segments[1] ?? null;
 
 
-
-if ($route != "api"){
-    require __DIR__ . "/public/index.html";
-    exit;
-
-}elseif($route === "api"){
+if($route === "api"){
     if(in_array($subRoute, ["login", "rooms", "client", "addon", "request", "reserve", "upload", "history", "reviews", "faturamento", "endereco"])){
-        require "routes/${subRoute}.php";
+        require "routes/api/${subRoute}.php";
 
     }else{
     return jsonResponse(['message'=>'rota nao encontrada', 404]); 
@@ -34,8 +29,12 @@ if ($route != "api"){
     }
     exit;
     
-}else{
-    echo "404 pagina nao encontrada";
+} else if ($route === "nfse") {
+    require "routes/nfse.php";
     exit;
+}
+else{
+    require __DIR__ . "/public/index.html";
+	exit;
 };
 ?>
