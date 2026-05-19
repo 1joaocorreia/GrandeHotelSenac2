@@ -185,6 +185,13 @@ Visão geral das principais pastas e arquivos:
    - `DB_NAME` – deve ser `dbhotel` (como no script).
    - `SECRET_KEY` – chave secreta usada para assinatura dos tokens JWT.
 
+4. **Verificar `.htaccess`**
+
+   Verifique se o arquivo `.htaccess` está configurado com:
+
+   - `RewriteBase /grandehotelsenac/`
+
+   Se a pasta do projeto tiver outro nome ou for publicada em outro caminho, ajuste essa linha para refletir o novo path.
 
 ---
 
