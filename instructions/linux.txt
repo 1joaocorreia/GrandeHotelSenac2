@@ -25,8 +25,8 @@ Adicione:
 
 	DocumentRoot <path_repositório>
 
-	ServerName grandehotelsenac2
-	ServerAlias grandehotelsenac2.com
+	ServerName grandehotelsenac2.com
+	ServerAlias www.grandehotelsenac2.com
 	DirectoryIndex index.php
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
@@ -46,11 +46,12 @@ Adicione:
 | AVISO! |
 ==========
 SUBSTITUA <path_repositório> pelo path para o repositório!
-Exemplo:
-    Se você baixou o repositório na localização ~/Downloads/GrandeHotelSenac2, então você deve colocar:
-        DocumentRoot "~/Downloads/GrandeHotelSenac2"
 
 
+==========
+| AVISO! |
+==========
+Apache não expande "~", então se você baixou o repositório em "~/Downloads/GrandeHotelSenac2" o path deverá ser algo como /home/<seu_usuario>/Downloads/GrandeHotelSenac2
 ---------------------------------------------------------------------------------
 
 
@@ -62,26 +63,44 @@ Execute:
 
 Nota: a2ensite é um utilitário fornecido pelo próprio servidor Apache.
 
+
+---------------------------------------------------------------------------------
+
+4. Habilitar o mod_rewrite
+
+Execute:
+	sudo a2enmod rewrite
+
+Nota: a2enmod também é um utilitário fornecido pelo próprio servidor Apache.
+
 ---------------------------------------------------------------------------------
 
 
-4. Modificar o arquivo de hosts
+5. Modificar o arquivo de hosts
 
     sudo micro /etc/hosts
 
 
 Adicione:
-
-127.0.0.1   grandehotelsenac2
 127.0.0.1   grandehotelsenac2.com
 
 
 Isso fará com que o navegador traduza "http://grandehotelsenac2.com" para http://127.0.0.1, que é o endereço do localhost.
 
+
+---------------------------------------------------------------------------------
+
+6. Modifique o arquivo .htaccess
+Substitua:
+	RewriteBase /grandehotelsenac/
+	por
+	RewriteBase /
+
+
 ---------------------------------------------------------------------------------
 
 
-5. Copie o Banco de Dados
+7. Copie o Banco de Dados
 (Não vou cobrir os passos para instalar o MariaDB aqui, você pode obter isso na página oficial.)
 (Também não vou cobrir os passos para instalar o phpMyAdmin)
 
