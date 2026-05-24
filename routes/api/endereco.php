@@ -40,6 +40,30 @@ function subRouteCliente() {
 
 }
 
+function subRouteCep() {
+    
+    global $segments;
+    global $conn;
+
+    if ($_SERVER["REQUEST_METHOD"] === "GET") {
+        $cep = $segments[3] ?? null;
+        if (! isset($cep)) {
+            return jsonResponse([
+                "status" => "error",
+                "message" => "CEP faltando"
+            ], 400);
+        }
+
+        EnderecoController::getEnderecoByCep($conn, $cep);
+
+    } else {
+        return jsonResponse([
+            "status" => "error",
+            "message" => "Método não permitido"
+        ], 405);
+    }
+}
+
 /* Considera o segments[2] (subrota) como sendo o ID do endereço no banco de dados */
 function defaultRoute() {
     global $subroute;
@@ -61,6 +85,9 @@ function defaultRoute() {
 switch ($subroute) {
     case "cliente": {
         subRouteCliente();
+    }
+    case "cep": {
+        subRouteCep();
     }
     default: {
         defaultRoute();

@@ -49,6 +49,26 @@ class EnderecoController {
         return jsonResponse($enderecoQuery, 200);
 
     }
+    public static function getEnderecoByCep($conn, $cep) {
+
+        if (! isset($conn) || ! isset($cep)) {
+            return jsonResponse([
+                "status" => "error",
+                "message" => "Erro interno no servidor"
+            ], 500);
+        }
+
+        $enderecoQuery = EnderecoModel::getEnderecoByCep($conn, $cep);
+        if (! isset($enderecoQuery)) {
+            return jsonResponse([
+                "status" => "erorr",
+                "message" => "Nenhum endereço encontrado com o cep: $cep"
+            ], 404);
+        }
+		
+		return jsonResponse($enderecoQuery, 200);
+
+    }
 }
 
 ?>

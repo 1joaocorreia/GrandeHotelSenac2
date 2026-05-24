@@ -1,7 +1,7 @@
 import { getCurrentUser, isCliente, getToken } from "../api/authAPI.js";
 import { getClientById } from "../api/clientAPI.js";
 import { getDadosFaturamentoByClientId } from "../api/faturamentoAPI.js";
-import { getEnderecoById } from "../api/enderecoAPI.js";
+import { getEnderecoById, getEnderecoByCep } from "../api/enderecoAPI.js";
 import { LeftMenu, LeftMenuRow } from "../components/LeftMenu.js";
 import { ErrorMessage } from "../components/ErrorMessage.js";
 import Navbar from "../components/Navbar.js";
@@ -134,8 +134,17 @@ async function changeField(event, fieldId) {
     } catch (err) {
         newValue = null;
     }
-	
+
 	if (newValue == null) { return; }
+
+    if (fieldId === "endereco-field" || fieldId === "billing-address-field") {
+        const query = await getEnderecoByCep(newValue);
+        if (! query || ! query.ok) {
+            renderUnknownProblem();
+            return;
+        }
+        newValue = query.raw.id;
+    }
 
 	const currentUser = getCurrentUser();
 	
@@ -151,16 +160,12 @@ async function changeField(event, fieldId) {
         renderUnknownProblem();
         return;
     }
-	const userAddress = (detailedUser.raw.endereco) ? await getEnderecoById(detailedUser.raw.endereco) : null;
-	
+    
 	const rotas = {
         "cliente": `/api/client/${detailedUser.raw.id}`,
         "faturamento": `/api/faturamento/cliente/${detailedUser.raw.id}`
     };
 	
-    console.log("rotas:");
-    console.log(rotas);
-
 	let choosenRoute = null;
 
     if (["nome-field", "email-field", "telefone-field", "endereco-field", "cpf-field"].includes(fieldId)) {
@@ -170,6 +175,7 @@ async function changeField(event, fieldId) {
         choosenRoute = rotas.faturamento;
     }
 	
+
     const method = 'PUT';
     const choosenId = idsAndColumns[fieldId];
 	const authToken = getToken();
@@ -182,8 +188,6 @@ async function changeField(event, fieldId) {
 
 	console.log(`Requesting < ${choosenRoute} >. [Method ${method}] ${choosenId}:${newValue}`);
 	
-    // TODO: Include Authorization Token
-    // Authorizaton: Bearer <token>
     const response = await fetch(choosenRoute, {
         method: method,
         body: `{"${choosenId}": "${newValue}"}`,
@@ -335,18 +339,25 @@ async function renderFaturamento() {
         return;
     }
 
-    let billing_address     = "";
-    let billing_email       = "";
+    let billing_address, billing_email = null;
 
     let query = await getDadosFaturamentoByClientId(currentUser.id);
-
-    billing_address = null;
-    billing_email = null;
     if (query.ok && query.raw) {
         billing_address = query.raw.endereco_faturamento ?? null;
+        if (billing_address) {
+            const query = await getEnderecoById(billing_address);
+            if (! query || ! query.ok) {
+                billing_address = null;
+            } else {
+                billing_address = query.raw.cep;
+            }
+        }
         billing_email = query.raw.email_faturamento ?? null;
+    } else {
+        renderUnknownProblem();
+        return;
     }
-    const enderecoFaturamento   = field('billing-address-field', "Endereço de Faturamento", billing_address, true);
+    const enderecoFaturamento   = field('billing-address-field', "Endereço de Faturamento (CEP)", billing_address, true);
     const emailFaturamento      = field('billing-email-field', "E-mail de faturamento", billing_email, true);
 
     renderZone.innerHTML = '';
